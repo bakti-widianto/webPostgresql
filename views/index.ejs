@@ -154,7 +154,7 @@
           <th>Float</th>
           <th>Date</th>
           <th>Boolean</th>
-          <th>action</th>
+          <th>Action</th>
         </tr>
       </thead>
       <tbody>
@@ -194,38 +194,38 @@
         <div class="modal-body">
 
 
-          <form action="" method="post" style="margin-top: 20px">
+          <form action="" method="post" id="form-add">
             <div class="form-group row">
               <label for="string" class="col-sm-2 col-form-label">String</label>
               <div class="col-sm-10">
-                <input type="text" class="form-control" id="string" name="string" placeholder="String">
+                <input type="text" class="form-control" id="addString" placeholder="String">
               </div>
             </div>
 
             <div class="form-group row">
               <label for="integer" class="col-sm-2 col-form-label">Integer</label>
               <div class="col-sm-10">
-                <input type="number" class="form-control" id="integer" name="integer" placeholder="Integer">
+                <input type="number" class="form-control" id="addInteger" placeholder="Integer">
               </div>
             </div>
 
             <div class="form-group row">
               <label for="float" class="col-sm-2 col-form-label">Float</label>
               <div class="col-sm-10">
-                <input type="text" class="form-control" id="float" name="float" placeholder="Float">
+                <input type="text" class="form-control" id="addFloat" placeholder="Float">
               </div>
             </div>
             <div class="form-group row">
               <label for="date" class="col-sm-2 col-form-label">Date</label>
               <div class="col-sm-10">
-                <input type="date" class="form-control" id="date" name="date" placeholder="end date">
+                <input type="date" class="form-control" id="addDate" placeholder="end date">
               </div>
             </div>
 
             <div class="form-group row">
               <label class="col-sm-2 col-form-label" for="boolean">Boolean</label>
               <div class="col-sm-10">
-                <select name="boolean" class="custom-select mr-sm-2" id="boolean">
+                <select class="custom-select mr-sm-2" id="addBoolean">
                   <option selected disabled>Choose the boolean...</option>
                   <option value="true">true</option>
                   <option value="false">false</option>
@@ -233,12 +233,81 @@
               </div>
             </div>
 
-            <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-              <button type="submit" class="btn btn-primary">Save</button>
-            </div>
           </form>
+          <div class="modal-footer btn-add">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-primary btn-save">Submit</button>
+          </div>
 
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- Modal EDIT -->
+  <div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Edit Your Data</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+
+          <form action="" method="post" id="form-add">
+            <div class="form-group row">
+              <label for="id" class="col-sm-2 col-form-label">ID</label>
+              <div class="col-sm-10">
+                <input type="text" class="form-control" id="editId" readonly>
+              </div>
+            </div>
+            <div class="form-group row">
+              <label for="string" class="col-sm-2 col-form-label">String</label>
+              <div class="col-sm-10">
+                <input type="text" class="form-control" id="editString" placeholder="String">
+              </div>
+            </div>
+
+            <div class="form-group row">
+              <label for="integer" class="col-sm-2 col-form-label">Integer</label>
+              <div class="col-sm-10">
+                <input type="number" class="form-control" id="editInteger" placeholder="Integer">
+              </div>
+            </div>
+
+            <div class="form-group row">
+              <label for="float" class="col-sm-2 col-form-label">Float</label>
+              <div class="col-sm-10">
+                <input type="text" class="form-control" id="editFloat" placeholder="Float">
+              </div>
+            </div>
+            <div class="form-group row">
+              <label for="date" class="col-sm-2 col-form-label">Date</label>
+              <div class="col-sm-10">
+                <input type="date" class="form-control" id="editDate" placeholder="end date">
+              </div>
+            </div>
+
+            <div class="form-group row">
+              <label class="col-sm-2 col-form-label" for="boolean">Boolean</label>
+              <div class="col-sm-10">
+                <select class="custom-select mr-sm-2" id="editBoolean">
+                  <option selected disabled>Choose the boolean...</option>
+                  <option value="true">true</option>
+                  <option value="false">false</option>
+                </select>
+              </div>
+            </div>
+
+          </form>
+          <div class="modal-footer btn-edit">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-primary btn-save">Submit</button>
+          </div>
 
         </div>
       </div>
@@ -248,14 +317,35 @@
 
 
 
+  <!-- CODINGAN JAVASCRIPT -->
+
   <script type="text/javascript">
+
+    //LISTENER 
     $(document).ready(() => {
       loadData();
+
+      $('.btn-add').on('click', '.btn-save', function (e) {
+        let string = $('#addString').val();
+        let integer = $('#addInteger').val();
+        let float = $('#addFloat').val();
+        let date = $('#addDate').val();
+        let boolean = $('#addBoolean').val();
+        addData(string, integer, float, date, boolean);
+        alert('Data telah di tambah !')
+      })
+
+      $("table tbody").on("click", ".btn-delete", function (e) {
+        if (confirm(`Data ID: ${$(this).attr('dataid')} akan di hapus?`)) {
+          let id = $(this).attr('dataid')
+          deleteData(id);
+        }
+      });
 
 
     })
 
-
+    // JQUERY AJAX
     const loadData = () => {
       $.ajax({
         method: "GET",
@@ -272,6 +362,10 @@
               <td>${item.floatdata}</td>
               <td>${item.datedata}</td>
               <td>${item.booleandata}</td>
+              <td>
+                <button class="btn btn-success btn-edit" type="button" dataid="${item.id}" data-toggle="modal" data-target="#editModal">EDIT</button>
+                <button class="btn btn-danger btn-delete" type="button" dataid="${item.id}">DELETE</button>
+                </td>
               </tr>`
           })
           $(`table tbody`).html(html);
@@ -281,23 +375,39 @@
         })
     }
 
+    //=====>ADD<=====
     const addData = (stringdata, integerdata, floatdata, datedata, booleandata) => {
       $.ajax({
         method: "POST",
         url: "http://localhost:3000/api/bread/",
-        data: {stringdata, integerdata, floatdata, datedata, booleandata},
+        data: { stringdata, integerdata, floatdata, datedata, booleandata },
         dataType: 'json'
       })
         .done(function (data) {
           loadData();
-    
+
         })
         .fail(function (err) {
           console.log('add gagal')
         })
+      $('#form-add').trigger('reset');
     }
 
+    //=====>DELETE<=====
+    const deleteData = (id) => {
+      $.ajax({
+        method: "DELETE",
+        url: "http://localhost:3000/api/bread/" + id,
+        dataType: 'json'
+      })
+        .done(function (data) {
+          loadData();
 
+        })
+        .fail(function (err) {
+          console.log('delete gagal')
+        })
+    }
 
 
   </script>
