@@ -61,8 +61,8 @@ module.exports = (db) => {
     //     } else {
     //         total = rows[0].total
     //         const pages = Math.ceil(total / limit)
-            
-            
+
+
     //         // console.log(pages)
     //         // console.log(searchFinal)
 
@@ -94,12 +94,38 @@ module.exports = (db) => {
         error: true,
         message: err
       })
-      
+      for(let i = 0;i< data.rows.length;i++){ 
+      data.rows[i].datedata = moment(data.rows[i].datedata).format('YYYY-MM-DD')
+      }
       res.status(200).json(
         data.rows
       )
     })
   });
+
+  //SHOW DATA MODAL EDIT
+  router.get('/:id', function (req, res, next) {
+    let id = req.params.id;
+    let sql = `SELECT * FROM bread WHERE id = ${id}`;
+    
+    db.query(sql, (err, data) => {
+      if (err) {
+        return res.send(err);
+      } else if (data.rows == 0) {
+        return res.send(`data tidak ada`);
+      }
+      else {
+        data.rows[0].datedata = moment(data.rows[0].datedata).format('YYYY-MM-DD') 
+        res.status(200).json({
+          data: data.rows[0]
+          
+        })
+      }
+    })
+  })
+
+
+
 
   //ADD DATA
   router.post('/', function (req, res, next) {

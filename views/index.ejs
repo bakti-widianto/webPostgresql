@@ -18,6 +18,7 @@
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
     integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
 
+    
 </head>
 
 
@@ -159,7 +160,7 @@
       </thead>
       <tbody>
 
-        </tr>
+        
 
       </tbody>
     </table>
@@ -296,9 +297,7 @@
               <label class="col-sm-2 col-form-label" for="boolean">Boolean</label>
               <div class="col-sm-10">
                 <select class="custom-select mr-sm-2" id="editBoolean">
-                  <option selected disabled>Choose the boolean...</option>
-                  <option value="true">true</option>
-                  <option value="false">false</option>
+
                 </select>
               </div>
             </div>
@@ -331,16 +330,27 @@
         let float = $('#addFloat').val();
         let date = $('#addDate').val();
         let boolean = $('#addBoolean').val();
-        addData(string, integer, float, date, boolean);
-        alert('Data telah di tambah !')
+
+        if(string == 0 || integer == 0 || float == 0 || date == 0 || boolean == 0){
+          alert('data tidak valid, mohon lengkapi semua data !')
+        }else{
+          addData(string, integer, float, date, boolean);
+          alert('data di tambahkan !')
+        }
       })
 
       $("table tbody").on("click", ".btn-delete", function (e) {
         if (confirm(`Data ID: ${$(this).attr('dataid')} akan di hapus?`)) {
+
           let id = $(this).attr('dataid')
           deleteData(id);
         }
       });
+
+      $("table tbody").on("click", ".btn-edit", function (e) {
+        let id = $(this).attr('dataid')
+        editData(id);
+      })
 
 
     })
@@ -409,6 +419,40 @@
         })
     }
 
+    //=====>EDIT(GET)<=====
+    const editData = (id) => {
+      $.ajax({
+        method: "GET",
+        url: "http://localhost:3000/api/bread/" + id,
+        dataType: 'json'
+      })
+        .done(hasil => {
+          // console.log(hasil);
+          let html = ''
+          let item = hasil.data;
+          // console.log(item.datedata)
+          $('#editId').val(item.id);
+          $('#editString').val(item.stringdata);
+          $('#editInteger').val(item.integerdata);
+          $('#editFloat').val(item.floatdata);
+          $('#editDate').val(item.datedata)
+          
+          if (item.booleandata == true) {
+            html += `<option value="true" selected>true</option>
+                     <option value="false">false</option>`
+          } else {
+            html += `<option value="false" selected>false</option>
+                <option value="true">true</option>`;
+          };
+          $('#editBoolean').html(html);
+
+        })
+        .fail(function (err) {
+          console.log('ambil data gagal')
+        })
+    }
+
+    //=====>EDIT(PUT)<=====
 
   </script>
 
