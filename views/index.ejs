@@ -18,7 +18,7 @@
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
     integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
 
-    
+
 </head>
 
 
@@ -160,7 +160,7 @@
       </thead>
       <tbody>
 
-        
+
 
       </tbody>
     </table>
@@ -305,7 +305,7 @@
           </form>
           <div class="modal-footer btn-edit">
             <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-            <button type="submit" class="btn btn-primary btn-save">Submit</button>
+            <button type="submit" class="btn btn-primary btn-change">Submit</button>
           </div>
 
         </div>
@@ -319,7 +319,6 @@
   <!-- CODINGAN JAVASCRIPT -->
 
   <script type="text/javascript">
-
     //LISTENER 
     $(document).ready(() => {
       loadData();
@@ -330,10 +329,9 @@
         let float = $('#addFloat').val();
         let date = $('#addDate').val();
         let boolean = $('#addBoolean').val();
-
-        if(string == 0 || integer == 0 || float == 0 || date == 0 || boolean == 0){
+        if (string == 0 || integer == 0 || float == 0 || date == 0 || boolean == 0) {
           alert('data tidak valid, mohon lengkapi semua data !')
-        }else{
+        } else {
           addData(string, integer, float, date, boolean);
           alert('data di tambahkan !')
         }
@@ -341,7 +339,6 @@
 
       $("table tbody").on("click", ".btn-delete", function (e) {
         if (confirm(`Data ID: ${$(this).attr('dataid')} akan di hapus?`)) {
-
           let id = $(this).attr('dataid')
           deleteData(id);
         }
@@ -352,9 +349,18 @@
         editData(id);
       })
 
+      $(".btn-edit").on("click", ".btn-change", function (e) {
+        let id = $('#editId').val();
+        let string = $('#editString').val();
+        let integer = $('#editInteger').val();
+        let float = $('#editFloat').val();
+        let date = $('#editDate').val();
+        let boolean = $('#editBoolean').val();
 
+        updateData(id, string, integer, float, date, boolean)
+        alert('data berhasil di ubah !')
+      })
     })
-
     // JQUERY AJAX
     const loadData = () => {
       $.ajax({
@@ -384,7 +390,6 @@
           console.log('gagal total')
         })
     }
-
     //=====>ADD<=====
     const addData = (stringdata, integerdata, floatdata, datedata, booleandata) => {
       $.ajax({
@@ -395,14 +400,12 @@
       })
         .done(function (data) {
           loadData();
-
         })
         .fail(function (err) {
           console.log('add gagal')
         })
       $('#form-add').trigger('reset');
     }
-
     //=====>DELETE<=====
     const deleteData = (id) => {
       $.ajax({
@@ -412,13 +415,11 @@
       })
         .done(function (data) {
           loadData();
-
         })
         .fail(function (err) {
           console.log('delete gagal')
         })
     }
-
     //=====>EDIT(GET)<=====
     const editData = (id) => {
       $.ajax({
@@ -436,7 +437,7 @@
           $('#editInteger').val(item.integerdata);
           $('#editFloat').val(item.floatdata);
           $('#editDate').val(item.datedata)
-          
+
           if (item.booleandata == true) {
             html += `<option value="true" selected>true</option>
                      <option value="false">false</option>`
@@ -445,15 +446,28 @@
                 <option value="true">true</option>`;
           };
           $('#editBoolean').html(html);
-
         })
         .fail(function (err) {
           console.log('ambil data gagal')
         })
     }
-
     //=====>EDIT(PUT)<=====
+    const updateData = (id, stringdata, integerdata, floatdata, datedata, booleandata) => {
+      $.ajax({
+        method: "PUT",
+        url: "http://localhost:3000/api/bread/" + id,
+        data: { stringdata, integerdata, floatdata, datedata, booleandata },
+        dataType: 'json'
+      })
+        .done(function (data) {
+          loadData();
 
+        })
+        .fail(function (err) {
+          console.log('add gagal')
+        })
+
+    }
   </script>
 
 </body>
