@@ -4,110 +4,96 @@ var moment = require('moment');
 
 /* GET users listing. */
 module.exports = (db) => {
+
   //SHOW DATA
   router.get('/', function (req, res, next) {
 
-    // let dataSearch = [];
-    // let search = false;
-    // const { checkId, id, checkString, string, checkInteger, integer, checkFloat, float, checkDate, startDate, endDate, checkBoolean, boolean } = req.query;
+    let dataSearch = [];
+    const page = req.query.page || 1
 
-    // if (checkId && id) {
-    //   dataSearch.push(`id = ${id}`)
-    //   search = true;
-    // }
+    // console.log(req.query)
 
-    // if (checkString && string) {
-    //   dataSearch.push(`string = ${string}`)
-    //   search = true;
-    // }
+    if (req.query.checkId && req.query.id) {
+      dataSearch.push(`id = ${req.query.id}`)
+    }
 
-    // if (checkInteger && integer) {
-    //   dataSearch.push(`integer = ${integer}`)
-    //   search = true;
-    // }
+    if (req.query.checkString && req.query.string) {
+      dataSearch.push(`stringdata = ${req.query.string}`)
+    }
 
-    // if (checkFloat && float) {
-    //   dataSearch.push(`float = ${float}`)
-    //   search = true;
-    // }
+    if (req.query.checkInteger && req.query.integer) {
+      dataSearch.push(`integerdata = ${req.query.integer}`)
+    }
 
-    // if (checkDate && startDate && endDate) {
-    //   dataSearch.push(`date BETWEEN ${startDate} AND ${endDate}`)
-    //   search = true;
-    // }
+    if (req.query.checkFloat && req.query.float) {
+      dataSearch.push(`floatdata = ${req.query.float}`)
+    }
 
-    // if (checkBoolean && boolean) {
-    //   dataSearch.push(`booelan = ${boolean}`)
-    //   search = true;
-    // }
+    if (req.query.checkDate && req.query.startDate && req.query.endDate) {
+      dataSearch.push(`datedata BETWEEN ${req.query.startDate} AND ${req.query.endDate}`)
+    }
 
-    // let searchFinal = "";
-    // if (search) {
-    //   searchFinal += `WHERE ${dataSearch.join(' AND ')}`
-    // }
+    if (req.query.checkBoolean && req.query.boolean) {
+      dataSearch.push(`booleandata = ${req.query.boolean}`)
+    }
 
+    let searchFinal = "";
+    if (dataSearch.length > 0) {
+      // console.log(dataSearch)
+      searchFinal += `WHERE ${dataSearch.join(' AND ')}`
+    }
     // console.log(searchFinal)
 
-    // const page = req.query.page || 1
-    // const limit = 3
-    // const offset = (page - 1) * limit
 
+    const limit = 4
+    const offset = (page - 1) * limit
 
-    // db.query(`SELECT COUNT (id) as total FROM bread`, (err, rows) => {
-    //     if (err) {
-    //         return console.error(err.message)
-    //     } else if (rows == 0) {
-    //         return res.send('data tidak di temukan')
-    //     } else {
-    //         total = rows[0].total
-    //         const pages = Math.ceil(total / limit)
-
-
-    //         // console.log(pages)
-    //         // console.log(searchFinal)
-
-
-    //         let sql = `SELECT * FROM bread ${searchFinal} LIMIT ? OFFSET ?`
-    //         db.query(sql, [limit,offset], (err, rows) => {
-
-    //             if (err) {
-    //                 return console.error(err.message)
-    //             } else if (rows == 0) {
-    //                 return res.send('data can not be found');
-    //             } else {
-    //                 let data = [];
-    //                 rows.forEach(row => {
-    //                     data.push(row);
-    //                 });
-    //                 // console.log(data)
-    //                 res.render('index', { data, page, pages })
-
-    //             }
-    //         })
-    //     }
-    // })
-
-
-
-    db.query('SELECT * FROM bread', (err, data) => {
+    let sqlPages = `SELECT COUNT (id) as total FROM bread ${searchFinal}`
+    console.log(sqlPages)
+    db.query(sqlPages, (err, data) => {
       if (err) return res.status(500).json({
         error: true,
         message: err
       })
-      for(let i = 0;i< data.rows.length;i++){ 
-      data.rows[i].datedata = moment(data.rows[i].datedata).format('YYYY-MM-DD')
+      else if (data.rows[0].total == 0) {
+        return res.send('data tidak di temukan')
       }
-      res.status(200).json(
-        data.rows
-      )
+      // console.log(data.rows[0].total)
+
+      const total = parseInt(data.rows[0].total)
+      const pages = Math.ceil(total / limit)
+
+
+      // console.log(pages)
+      // console.log(offset)
+      
+      let sql = `SELECT * FROM bread ${searchFinal} ORDER BY id LIMIT $1 OFFSET $2`
+      db.query(sql, [limit, offset], (err, data) => {
+        if (err) return res.status(500).json({
+          error: true,
+          message: err
+        })
+        for (let i = 0; i < data.rows.length; i++) {
+          data.rows[i].datedata = moment(data.rows[i].datedata).format('YYYY-MM-DD')
+        }
+        res.status(200).json({
+          data: data.rows, pages, page
+
+        })
+      })
+
     })
+
+
+
+
   });
 
   //SHOW DATA MODAL EDIT
   router.get('/:id', function (req, res, next) {
     let id = req.params.id;
     let sql = `SELECT * FROM bread WHERE id = ${id}`;
-    
+
     db.query(sql, (err, data) => {
       if (err) {
         return res.send(err);
@@ -115,10 +101,10 @@ module.exports = (db) => {
         return res.send(`data tidak ada`);
       }
       else {
-        data.rows[0].datedata = moment(data.rows[0].datedata).format('YYYY-MM-DD') 
+        data.rows[0].datedata = moment(data.rows[0].datedata).format('YYYY-MM-DD')
         res.status(200).json({
           data: data.rows[0]
-          
+
         })
       }
     })
